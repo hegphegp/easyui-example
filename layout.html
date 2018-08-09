@@ -11,26 +11,46 @@
         $().ready(function() {
 		    var treeJson = [{"id":1,"text":"My Documents","children":[{"id":11,"text":"Photos","state":"closed","children":[{"id":111,"text":"Friend"},{"id":112,"text":"Wife"}]},{"id":12,"text":"Program Files","state":"closed","children":[{"id":121,"text":"Intel"},{"id":122,"text":"Java"}]},{"id":16,"text":"Actions","children":[{"text":"Add","iconCls":"icon-add"},{"text":"Remove","iconCls":"icon-remove"}]},{"id":13,"text":"index.html"}]},{"id":1,"text":"My Documents","children":[{"id":11,"text":"Photos","state":"closed","children":[{"id":111,"text":"Friend"},{"id":112,"text":"Wife"}]},{"id":12,"text":"Program Files","state":"closed","children":[{"id":121,"text":"Intel"},{"id":122,"text":"Java"}]},{"id":16,"text":"Actions","children":[{"text":"Add","iconCls":"icon-add"},{"text":"Remove","iconCls":"icon-remove"}]},{"id":13,"text":"index.html"}]}];
  			for (var i=0; i<3; i++) {
-				var item = "item"+i;
-				$('#menuTreeAccordion').accordion('add', {
-					iconCls: 'icon-save',
-					title: '新标题',
-					content: '<div id="'+item+'"></div>',
-					selected: false
-				});
-				$('#'+item).tree({
-					data:treeJson,
-					onClick:function(node) {
-						if(node.hasOwnProperty('children')==false) {
-                    		alert(node.text)
-						}
-                	}
-				});
-			}		    
+                var item = "item" + i;
+                $('#menuTreeAccordion').accordion('add', {
+                    iconCls: 'icon-save',
+                    title: '新标题',
+                    content: '<div id="' + item + '"></div>',
+                    selected: false
+                });
+                $('#' + item).tree({
+                    data: treeJson,
+                    onClick: function (node) {
+                        //判断是叶子节点且有URL属性
+                        if (node.hasOwnProperty('children') == false) {
+                            // tab的标题不是唯一的，不能通过名称某个tab是否已存在，不存在先创建，如果存在就选择
+                            // easyui提过的API只有通过tab的标题或者下标来判断tab是否存在
+                            $('#mainPageTab').tabs('add',{
+                                title:'accordion',
+                                // href:'accordion.html',
+								content: 'aaaa',
+                                closable:true
+                            });
+                        }
+                    }
+                });
+            }
+            /**
+var e =$('#main').tabs('exists','accordion');
+if(e==true) {
+	$('#main').tabs('select','accordion');
+	return ;
+}
+$('#main').tabs('add',{
+	title:'accordion',
+	href:'accordion.html',
+	closable:true
+});
+			 */
 			function setWindowSize() {
 				var height = $(window).height()-16;
-				$("#main_layout").attr("style","width:100%;height:"+height+"px");
-				$("#main_layout").layout("resize", {
+				$("#mainLayout").attr("style","width:100%;height:"+height+"px");
+				$("#mainLayout").layout("resize", {
 					width:"100%",
 					height:height+"px"
 				});
@@ -42,7 +62,7 @@
 
 </head>
 <body>
-	<div id="main_layout" class="easyui-layout">
+	<div id="mainLayout" class="easyui-layout">
 		<div data-options="region:'north'" style="height:50px"></div>
 		<div data-options="region:'south', split:true" style="height:50px;"></div>
 		<div data-options="region:'west', split:true" title="菜单导航栏" style="width:250px;">
@@ -50,7 +70,7 @@
 		</div>
 		<div data-options="region:'east', split:true" title="右侧提示栏" style="width:180px;"></div>
 		<div data-options="region:'center'">
-			<div class="easyui-tabs" style="width:100%;height:100%">
+			<div id="mainPageTab" class="easyui-tabs" style="width:100%;height:100%">
 				<div title="首页" style="padding:10px">
 					<h1>首页</h1>
 				</div>
