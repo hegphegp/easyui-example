@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>后台模板</title>
+    <link rel="stylesheet" type="text/css" href="plugins/jquery-easyui-1.5.5.5/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="plugins/jquery-easyui-1.5.5.5/themes/icon.css">
+    <script type="text/javascript" src="plugins/jquery-easyui-1.5.5.5/jquery.min.js"></script>
+    <script type="text/javascript" src="plugins/jquery-easyui-1.5.5.5/jquery.easyui.min.js"></script>
+    <script type="text/javascript">
+        $().ready(function() {
+            var treeJson = [{"id":1,"text":"My Documents","children":[{"id":11,"text":"Photos","state":"closed","children":[{"id":111,"text":"Friend"},{"id":112,"text":"Wife"}]},{"id":12,"text":"Program Files","state":"closed","children":[{"id":121,"text":"Intel"},{"id":122,"text":"Java"}]},{"id":16,"text":"Actions","children":[{"text":"Add","iconCls":"icon-add"},{"text":"Remove","iconCls":"icon-remove"}]},{"id":13,"text":"index.html"}]},{"id":1,"text":"My Documents","children":[{"id":11,"text":"Photos","state":"closed","children":[{"id":111,"text":"Friend"},{"id":112,"text":"Wife"}]},{"id":12,"text":"Program Files","state":"closed","children":[{"id":121,"text":"Intel"},{"id":122,"text":"Java"}]},{"id":16,"text":"Actions","children":[{"text":"Add","iconCls":"icon-add"},{"text":"Remove","iconCls":"icon-remove"}]},{"id":13,"text":"index.html"}]}];
+            $('#menuTree').tree({
+                data: treeJson
+            });
+
+            $('#menuTree .tree-node').css('height','28px');
+            $('#menuTree .tree-title').css('font-size','18px');
+            $('#menuTree .tree-title').css('height','28px');
+            $('#menuTree .tree-title').css('line-height','28px');
+            $('#menuTree .tree-title').css('padding','0px');
+            $('#menuTree .tree-title').css('margin','0px');
+
+            function setWindowSize() {
+                var height = $(window).height()-16;
+                $("#outerLayout").attr("style","width:100%;height:"+height+"px");
+                $("#outerLayout").layout("resize", {
+                    width:"100%",
+                    height:height+"px"
+                });
+            };
+            $(document).ready(setWindowSize);
+            $(window).resize(setWindowSize);
+        });
+    </script>
+
+</head>
+<body>
+<div id="outerLayout" class="easyui-layout">
+    <div data-options="region:'north'" style="height:50px"></div>
+    <div id="menuTree" data-options="region:'west', split:true" title="菜单导航栏" style="width:250px;"></div>
+    <div data-options="region:'center'"></div>
+</div>
+</body>
+</html>
