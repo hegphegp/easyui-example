@@ -21,8 +21,9 @@ $.fn.tree.defaults.loadFilter = function (data, parent) {
          
         for (i = 0, l = data.length; i < l; i++) {
             if (tmpMap[data[i][parentField]] && data[i][idFiled] != data[i][parentField]) {
-                if (!tmpMap[data[i][parentField]]['children'])
+                if (!tmpMap[data[i][parentField]]['children']) {
                     tmpMap[data[i][parentField]]['children'] = [];
+				}
                 data[i]['text'] = data[i][textFiled];
                 tmpMap[data[i][parentField]]['children'].push(data[i]);
             } else {

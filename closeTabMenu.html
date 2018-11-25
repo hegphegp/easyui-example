@@ -7,7 +7,7 @@
     <link rel="stylesheet" type="text/css" href="plugins/jquery-easyui-1.5.5.5/themes/icon.css">
     <script type="text/javascript" src="plugins/jquery-easyui-1.5.5.5/jquery.min.js"></script>
     <script type="text/javascript" src="plugins/jquery-easyui-1.5.5.5/jquery.easyui.min.js"></script>
-	<script type="text/javascript" src="plugins/jquery-easyui-1.5.5.5/expands/jquery.tree-expand.js"></script>
+	<script type="text/javascript" src="plugins/jquery-easyui-1.5.5.5/expands/list-to-tree-data.js"></script>
     <!--<style>-->
         <!--* {-->
             <!--font-family: "Helvetica Neue","Helvetica","PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC","WenQuanYi Micro Hei","Arial",sans-serif;-->
@@ -109,8 +109,7 @@
 								$('#mainPageTab').tabs('select', node.text+node.id);
 							} else {
 								$('#mainPageTab').tabs('add', {
-									// 在同一个tab面板，如果存在同名的tab页，若此时不一个个打开同名的tab页，无法区分那个tab页对应什么内容
-									// 对easyui官方无尽的失望，easyui只提供根据title检测tab页是否存在的方法，官方无能，只能靠自己。在title后面补上item的唯一性id，这样子确保title的唯一性
+									// 在同一个tab面板，如果存在同名的tab页，若此时不一个个打开同名的tab页，无法区分那个tab页对应什么内容，所有官方通过title判断tab页是否存在是有道理的
 									title: node.text+'<div style="display:none;">'+node.id+'</div>',
 									href:'tableData.html',
 									// content: '<div style="padding:10px;">accordion</div>',
@@ -118,14 +117,12 @@
 									closable:true
 								});
 							}
-						} else {
-							// easyui tree当点击父节点时让直系子节点展开
-							$(this).tree('toggle', node.target);//单击文本切换展开/折叠节点的状态
+						} else {  // easyui tree当点击父节点时让直系子节点展开
+							$(this).tree('toggle', node.target); //单击文本切换展开/折叠节点的状态
 						}
 					},
 					onLoadSuccess:function() {
-						// 加载成功后，让tree所有的节点折叠起来
-						$(this).tree("collapseAll");
+						$(this).tree("collapseAll");  // 加载成功后，让tree所有的节点折叠起来
 					},
 					parentField:"pid",
 					textFiled:"text",
@@ -133,6 +130,25 @@
 				});
 			}
 
+			//tab右键触发时候所触发的函数
+			$("#mainPageTab").tabs({
+				onContextMenu:function(e, title, index) {
+					if(index!=0) { // 首页的tab页不显示关闭tab页的右键菜单
+						e.preventDefault();
+						$("#tab-tools").menu('show', {
+							left : e.pageX,
+							top : e.pageY
+						});
+					}
+				}
+			});
+
+			// tabs右击菜单绑定事件
+			$("#tab-tools").menu({
+				onClick : function (node) {
+					closeTab(this, node.id);
+				}
+			});
             $('#menuTree .tree-node').css('height','28px');
             $('#menuTree .tree-title').css('font-size','18px');
             $('#menuTree .tree-title').css('height','28px');
@@ -151,6 +167,46 @@
             $(document).ready(setWindowSize);
             $(window).resize(setWindowSize);
         });
+
+		//关闭选项卡功能
+		function closeTab(menu, id) {
+			var tab = $("#mainPageTab").tabs('getSelected');        //当前所选tab
+			var index = $("#mainPageTab").tabs('getTabIndex', tab); //当前所选tab的下标位置
+			var tablist = $("#mainPageTab").tabs('tabs');           //所有的tabs列表
+			switch (id) {
+				case 'closeSelf': //关闭当前标签
+					$("#mainPageTab").tabs("close", index);
+					break;
+				case 'closeOthor': //关闭其他标签
+					for (var i=tablist.length-1; i>index; i--) { // 关闭右侧
+						$("#mainPageTab").tabs('close',i);
+					}
+					var num = index-1;
+					for (var i=num; i>=1; i--) { // 关闭左侧
+						$("#mainPageTab").tabs('close', 1);
+					}
+					break;
+				case 'closeLeft': //关闭左侧
+					var num = index-1;
+					for (var i=num; i>=1; i--) {
+						$("#mainPageTab").tabs('close', 1);
+					}
+					break;
+				case 'closeRight': //关闭右侧
+					for(var i=tablist.length-1; i>index; i--) {
+						$("#mainPageTab").tabs('close',i);
+					}
+					break;
+				case 'closeAll': //关闭所有
+					for (var i=tablist.length-1; i>=0; i--) {
+						if (i!=0) {
+							$("#mainPageTab").tabs("close", i);
+						}
+					}
+					break;
+				default:
+			}
+		}
     </script>
 
 </head>
@@ -164,6 +220,16 @@
         <div id="mainPageTab" class="easyui-tabs" style="width:100%;height:100%">
 			<div title="首页">
 				<div align="center" style="padding-top: 100px;"><font color="red" size="8">首页首页首页首页首页首页首页首页首页首页首页首页首页首页首页首页首页首页首页首页首页首页首页</font></div>
+			</div>
+			<!-- 以下为tabs右击事件 -->
+			<div id="tab-tools" class="easyui-menu" style="width:135px; display:none">
+				<div id="closeSelf" data-options="iconCls:'icon-cross'">关闭当前标签</div>
+				<div id="closeOthor" data-options="iconCls:'icon-cross'">关闭其他标签</div>
+				<div class="menu-sep"></div>
+				<div id="closeLeft" data-options="iconCls:'icon-cross'">关闭左侧标签</div>
+				<div id="closeRight" data-options="iconCls:'icon-cross'">关闭右侧标签</div>
+				<div class="menu-sep"></div>
+				<div id="closeAll" iconCls="icon-cancel">关闭所有标签</div>
 			</div>
 		</div>
     </div>
