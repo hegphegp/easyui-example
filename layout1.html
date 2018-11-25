@@ -19,7 +19,23 @@
                     selected: false
                 });
                 $('#' + item).tree({
-                    data: treeJson
+                    data: treeJson,
+					onClick: function (node) {
+                        //判断是叶子节点且有URL属性
+                        if (node.hasOwnProperty('children') == false) {
+                            // tab的标题不是唯一的，不能通过名称某个tab是否已存在，不存在先创建，如果存在就选择
+                            // easyui提过的API只有通过tab的标题或者下标来判断tab是否存在
+                            $('#mainPageTab').tabs('add',{
+                                title:'accordion',
+                                // href:'accordion.html',
+								content: '<div style="padding:10px;">accordion</div>',
+                                closable:true
+                            });
+                        }  else {
+                            // easyui tree当点击父节点时让直系子节点展开
+                            $(this).tree('toggle', node.target);//单击文本切换展开/折叠节点的状态
+                        }
+                    }
                 });
             }
 

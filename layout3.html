@@ -91,32 +91,47 @@
 					{"id":"440308002000","pid":"440308000000","text":"盐田街道办事处","iconCls":"tree-file"},
 					{"id":"440308003000","pid":"440308000000","text":"沙头角街道办事处","iconCls":"tree-file"}
 			];
-
-            $('#menuTree').tree({
-                data: treeJson,
-                onClick: function (node) {
-                    //判断是叶子节点且有URL属性
-                    if (node.hasOwnProperty('children') == false) {
-                        // tab的标题不是唯一的，不能通过名称某个tab是否已存在，不存在先创建，如果存在就选择
-                        // easyui提过的API只有通过tab的标题或者下标来判断tab是否存在
-                        $('#mainPageTab').tabs('add',{
-                            title: 'accordion',
-                            // href:'accordion.html',
-                            content: '<div style="padding:10px;">accordion</div>',
-                            closable:true
-                        });
-                    } else {
-                        // easyui tree当点击父节点时让直系子节点展开
-                        $(this).tree('toggle', node.target);//单击文本切换展开/折叠节点的状态
-                    }
-                },
-				onLoadSuccess:function() {  
-					$(this).tree("collapseAll");
-				},
-				parentField:"pid",
-        		textFiled:"text",
-        		idFiled:"id"
-            });
+ 			for (var i=0; i<3; i++) {
+                var item = "item" + i;
+                $('#menuTreeAccordion').accordion('add', {
+                    iconCls: 'icon-save',
+                    title: '新标题',
+                    content: '<div id="' + item + '"></div>',
+                    selected: false
+                });
+                $('#' + item).tree({
+					data: treeJson,
+					onClick: function (node) {
+						//判断是叶子节点且有URL属性
+						if (node.hasOwnProperty('children') == false) {
+							// easyui提过的API只有通过tab的标题或者下标来判断tab是否存在
+							if ($('#mainPageTab').tabs('exists', node.text+node.id)) {
+								$('#mainPageTab').tabs('select', node.text+node.id);
+							} else {
+								$('#mainPageTab').tabs('add', {
+									// 在同一个tab面板，如果存在同名的tab页，若此时不一个个打开同名的tab页，无法区分那个tab页对应什么内容
+									// 对easyui官方无尽的失望，easyui只提供根据title检测tab页是否存在的方法，官方无能，只能靠自己。在title后面补上item的唯一性id，这样子确保title的唯一性
+									title: node.text+'<div style="display:none;">'+node.id+'</div>',
+									href:'tableData.html',
+									// content: '<div style="padding:10px;">accordion</div>',
+									// content = '<iframe scrolling="auto" frameborder="0"  src="'+node.url+'" style="width:100%;height:100%;"></iframe>';
+									closable:true
+								});
+							}
+						} else {
+							// easyui tree当点击父节点时让直系子节点展开
+							$(this).tree('toggle', node.target);//单击文本切换展开/折叠节点的状态
+						}
+					},
+					onLoadSuccess:function() {
+						// 加载成功后，让tree所有的节点折叠起来
+						$(this).tree("collapseAll");
+					},
+					parentField:"pid",
+					textFiled:"text",
+					idFiled:"id"
+				});
+			}
 
             $('#menuTree .tree-node').css('height','28px');
             $('#menuTree .tree-title').css('font-size','18px');
@@ -142,9 +157,15 @@
 <body>
 <div id="outerLayout" class="easyui-layout">
     <div data-options="region:'north'" style="height:50px"></div>
-    <div id="menuTree" data-options="region:'west', split:true" title="菜单导航栏" style="width:250px;"></div>
+	<div data-options="region:'west', split:true" title="菜单导航栏" style="width:250px;">
+		<div id="menuTreeAccordion" class="easyui-accordion" data-options="fit:true,border:false,animate:false"></div>
+	</div>
     <div data-options="region:'center'">
-        <div id="mainPageTab" class="easyui-tabs" style="width:100%;height:100%"></div>
+        <div id="mainPageTab" class="easyui-tabs" style="width:100%;height:100%">
+			<div title="首页">
+				<div align="center" style="padding-top: 100px;"><font color="red" size="8">首页首页首页首页首页首页首页首页首页首页首页首页首页首页首页首页首页首页首页首页首页首页首页</font></div>
+			</div>
+		</div>
     </div>
 </div>
 </body>
